@@ -54,7 +54,8 @@
 <svg id="chart_new_tests"></svg>
 <svg id="chart_new_deaths"></svg>
 <svg id="chart_new_people_vaccinated"></svg>
-<svg id="chart_new_age_0-9_conf_case"></svg>
+<svg id="chart_age"></svg>
+<svg id="chart_variants"></svg>
 
 <script>
 async function init() {
@@ -149,19 +150,106 @@ async function init() {
                 .attr("class", "xaxis")
                 .attr("transform", "translate(" + margin + "," + (height + top_margin) + ")")
                 .call(
-                    xAxis.tickSize([0,0])
+                    xAxis.tickSize(0)
                         .tickFormat(d3.timeFormat(""))
                 );
         }
 
         return vis;
     }
- 
+
+    function drawLineChart(line_values, chart_id, has_x_axis, chart_title) {
+        var vis = d3.select(chart_id)
+            .attr("width", width + 2 * margin)
+            .attr("height", height + top_margin + margin);
+
+        var g = vis.append("g")
+                .attr("transform", "translate(" + margin + "," + top_margin + ")");
+
+        var parseTime = d3.timeParse("%Y%m%d");
+
+        var x = d3.scaleTime().range([0, width]),
+            y = d3.scaleLinear().range([height, 0]),
+            z = d3.scaleOrdinal(d3.schemeCategory10);
+
+        var line = d3.line()
+            .curve(d3.curveBasis)
+            .x(function(d) {
+                // console.log(d.date);
+                return x(d.date);
+            })
+            .y(function(d) {
+                // console.log(d.electricity);
+                return y(d.electricity);
+            });
+
+        x.domain(d3.extent(data, function(d) { return d.date; }));
+        y.domain([
+            d3.min(line_values, function(c) { return d3.min(c.values, function(d) { return d.electricity; }); }),
+            d3.max(line_values, function(c) { return d3.max(c.values, function(d) { return d.electricity; }); })
+        ]);
+        z.domain(line_values.map(function(c) { return c.id; }));
+
+        g.append("g")
+            .attr("class", "axis axis--x")
+            .attr("transform", "translate(0," + height + ")")
+            .call(d3.axisBottom(x));
+
+        g.append("g")
+            .attr("class", "axis axis--y")
+            .call(d3.axisLeft(y))
+            .append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 6)
+            .attr("dy", "0.71em")
+            .attr("fill", "#000")
+            .text("Electricity, kWh");
+
+        var etc = g.selectAll(".etc")
+            .data(line_values)
+            .enter().append("g")
+            .attr("class", "etc");
+
+        etc.append("path")
+            .attr("class", "line")
+            .attr("d", function(d) {
+                console.log(d);
+                return line(d.values);
+            })
+            .style("stroke", function(d) { return z(d.id); });
+
+        // etc.append("text")
+        //     .datum(function(d) { return {id: d.id, value: d.values[d.values.length - 1]}; })
+        //     .attr("transform", function(d) { return "translate(" + x(d.value.date) + "," + y(d.value.value) + ")"; })
+        //     .attr("x", 3)
+        //     .attr("dy", "0.35em")
+        //     .style("font", "10px sans-serif")
+        //     .text(function(d) { return d.id; });
+
+        return vis;
+    }
+
     var vis = drawChart('new_cases', '#chart_new_cases', true, 'new_cases');
     var vis = drawChart('new_tests', '#chart_new_tests', true, 'new_tests');
     var vis = drawChart('new_deaths', '#chart_new_deaths', true, 'new_deaths');
     var vis = drawChart('new_people_vaccinated', '#chart_new_people_vaccinated', true, 'new_people_vaccinated');
-    var vis = drawChart('new_age_0-9_conf_case', '#chart_new_age_0-9_conf_case', false, 'new_age_0-9_conf_case');
+
+    // age_0-9_conf_case ~ age_over-80_conf_case
+    var parseTime = d3.timeParse("%Y-%m-%d");
+    var testaa = parseTime("2021-07-10");
+    var line_values = [];
+    line_values.push({id: 'age (0~9)', values: data.map((x) => {return {date: parseTime(x.date), electricity: parseFloat(x["new_age_0-9_conf_case"])}})});
+    line_values.push({id: 'age (10~19)', values: data.map((x) => {return {date: parseTime(x.date), electricity: parseFloat(x["new_age_10-19_conf_case"])}})});
+    line_values.push({id: 'age (20~29)', values: data.map((x) => {return {date: parseTime(x.date), electricity: parseFloat(x["new_age_20-29_conf_case"])}})});
+    line_values.push({id: 'age (30~39)', values: data.map((x) => {return {date: parseTime(x.date), electricity: parseFloat(x["new_age_30-39_conf_case"])}})});
+    line_values.push({id: 'age (40~49)', values: data.map((x) => {return {date: parseTime(x.date), electricity: parseFloat(x["new_age_40-49_conf_case"])}})});
+    line_values.push({id: 'age (50~59)', values: data.map((x) => {return {date: parseTime(x.date), electricity: parseFloat(x["new_age_50-59_conf_case"])}})});
+    line_values.push({id: 'age (60~69)', values: data.map((x) => {return {date: parseTime(x.date), electricity: parseFloat(x["new_age_60-69_conf_case"])}})});
+    line_values.push({id: 'age (70~79)', values: data.map((x) => {return {date: parseTime(x.date), electricity: parseFloat(x["new_age_70-79_conf_case"])}})});
+    line_values.push({id: 'age (80~)', values: data.map((x) => {return {date: parseTime(x.date), electricity: parseFloat(x["new_age_over-80_conf_case"])}})});
+    var vis = drawLineChart(line_values, '#chart_age', false, 'age');
+
+    // var_sequences_total만 빼고 var_...
 
     //////////////////////////////////////////////////
     // mouse actions
