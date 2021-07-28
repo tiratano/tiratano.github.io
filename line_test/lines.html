@@ -50,6 +50,15 @@
                 })
             };
         });
+        // test
+        var parseTime2 = d3.timeParse("%Y-%m-%d");
+        device = [];
+        device.push({id:"A/C", values:[
+                {date: parseTime2("2016-10-01"), electricity: 1},
+                {date: parseTime2("2016-10-02"), electricity: 2},
+                {date: parseTime2("2016-10-03"), electricity: 3}
+            ]
+        })
 
         x.domain(d3.extent(data, function(d) { return d.date; }));
         y.domain([
@@ -81,6 +90,7 @@
         etc.append("path")
             .attr("class", "line")
             .attr("d", function(d) {
+                console.log(d.values);
                 return line(d.values);
             })
             .style("stroke", function(d) { return z(d.id); });

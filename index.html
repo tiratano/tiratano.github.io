@@ -159,12 +159,12 @@ async function init() {
     }
 
     function drawLineChart(line_values, chart_id, has_x_axis, chart_title) {
-        var vis = d3.select(chart_id)
-            .attr("width", width + 2 * margin)
-            .attr("height", height + top_margin + margin);
-
-        var g = vis.append("g")
-                .attr("transform", "translate(" + margin + "," + top_margin + ")");
+        var svg = d3.select(chart_id),
+            margin = {top: 20, right: 80, bottom: 30, left: 50},
+            width = svg.attr("width") - margin.left - margin.right,
+            height = svg.attr("height") - margin.top - margin.bottom,
+            g = svg.append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
         var parseTime = d3.timeParse("%Y%m%d");
 
@@ -174,21 +174,24 @@ async function init() {
 
         var line = d3.line()
             .curve(d3.curveBasis)
-            .x(function(d) {
-                // console.log(d.date);
-                return x(d.date);
-            })
-            .y(function(d) {
-                // console.log(d.electricity);
-                return y(d.electricity);
-            });
+            .x(function(d) { return x(d.date); })
+            .y(function(d) { return y(d.electricity); });
+
+        var parseTime2 = d3.timeParse("%Y-%m-%d");
+        device = [];
+        device.push({id:"A/C", values:[
+                {date: parseTime2("2016-10-01"), electricity: 1},
+                {date: parseTime2("2016-10-02"), electricity: 2},
+                {date: parseTime2("2016-10-03"), electricity: 3}
+            ]
+        })
 
         x.domain(d3.extent(data, function(d) { return d.date; }));
         y.domain([
-            d3.min(line_values, function(c) { return d3.min(c.values, function(d) { return d.electricity; }); }),
-            d3.max(line_values, function(c) { return d3.max(c.values, function(d) { return d.electricity; }); })
+            d3.min(device, function(c) { return d3.min(c.values, function(d) { return d.electricity; }); }),
+            d3.max(device, function(c) { return d3.max(c.values, function(d) { return d.electricity; }); })
         ]);
-        z.domain(line_values.map(function(c) { return c.id; }));
+        z.domain(device.map(function(c) { return c.id; }));
 
         g.append("g")
             .attr("class", "axis axis--x")
@@ -206,27 +209,10 @@ async function init() {
             .text("Electricity, kWh");
 
         var etc = g.selectAll(".etc")
-            .data(line_values)
+            .data(device)
             .enter().append("g")
             .attr("class", "etc");
 
-        etc.append("path")
-            .attr("class", "line")
-            .attr("d", function(d) {
-                console.log(d);
-                return line(d.values);
-            })
-            .style("stroke", function(d) { return z(d.id); });
-
-        // etc.append("text")
-        //     .datum(function(d) { return {id: d.id, value: d.values[d.values.length - 1]}; })
-        //     .attr("transform", function(d) { return "translate(" + x(d.value.date) + "," + y(d.value.value) + ")"; })
-        //     .attr("x", 3)
-        //     .attr("dy", "0.35em")
-        //     .style("font", "10px sans-serif")
-        //     .text(function(d) { return d.id; });
-
-        return vis;
     }
 
     var vis = drawChart('new_cases', '#chart_new_cases', true, 'new_cases');
@@ -238,8 +224,8 @@ async function init() {
     var parseTime = d3.timeParse("%Y-%m-%d");
     var testaa = parseTime("2021-07-10");
     var line_values = [];
-    line_values.push({id: 'age (0~9)', values: data.map((x) => {return {date: parseTime(x.date), electricity: parseFloat(x["new_age_0-9_conf_case"])}})});
-    line_values.push({id: 'age (10~19)', values: data.map((x) => {return {date: parseTime(x.date), electricity: parseFloat(x["new_age_10-19_conf_case"])}})});
+    line_values.push({id: 'age(0~9)', values: data.map((x) => {return {date: parseTime(x.date), electricity: parseFloat(x["new_age_0-9_conf_case"])}})});
+    line_values.push({id: 'age(10~19)', values: data.map((x) => {return {date: parseTime(x.date), electricity: parseFloat(x["new_age_10-19_conf_case"])}})});
     line_values.push({id: 'age (20~29)', values: data.map((x) => {return {date: parseTime(x.date), electricity: parseFloat(x["new_age_20-29_conf_case"])}})});
     line_values.push({id: 'age (30~39)', values: data.map((x) => {return {date: parseTime(x.date), electricity: parseFloat(x["new_age_30-39_conf_case"])}})});
     line_values.push({id: 'age (40~49)', values: data.map((x) => {return {date: parseTime(x.date), electricity: parseFloat(x["new_age_40-49_conf_case"])}})});
@@ -247,7 +233,16 @@ async function init() {
     line_values.push({id: 'age (60~69)', values: data.map((x) => {return {date: parseTime(x.date), electricity: parseFloat(x["new_age_60-69_conf_case"])}})});
     line_values.push({id: 'age (70~79)', values: data.map((x) => {return {date: parseTime(x.date), electricity: parseFloat(x["new_age_70-79_conf_case"])}})});
     line_values.push({id: 'age (80~)', values: data.map((x) => {return {date: parseTime(x.date), electricity: parseFloat(x["new_age_over-80_conf_case"])}})});
-    var vis = drawLineChart(line_values, '#chart_age', false, 'age');
+    line_values = [];
+    var parseTime2 = d3.timeParse("%Y-%m-%d");
+    line_values = [];
+    line_values.push({id:"A/C", values:[
+            {date: parseTime2("2016-10-01"), electricity: 1},
+            {date: parseTime2("2016-10-02"), electricity: 2},
+            {date: parseTime2("2016-10-03"), electricity: 3}
+        ]
+    })
+    drawLineChart(line_values, '#chart_age', false, 'age');
 
     // var_sequences_total만 빼고 var_...
 
