@@ -81,7 +81,7 @@
 </nav>
 
 <div class="content">
-    <div id="browser_warning" style="display: none">
+    <div id="browser_warning" style="display: block">
         <div class="alert alert-danger" role="alert">
             This website only works in Google Chrome.
         </div>
@@ -231,8 +231,8 @@
     $(document).ready(function(){
         var browser_name = navigator.userAgent;
         console.log('browser: ', browser_name);
-        if (browser_name.indexOf('Chrome') < 0) {
-            $("#browser_warning").attributes("display", "block");
+        if (browser_name.indexOf('Chrome') >= 0) {
+            $("#browser_warning").attributes("display", "none");
             return;
         }
 
