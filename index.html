@@ -2,10 +2,21 @@
 <meta charset="utf-8" xmlns="">
 <html>
 <head>
+    <!--    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">-->
+    <link rel="stylesheet" href="./bootstrap.min.css">
+    <!--    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>-->
+    <script src="./jquery-3.2.1.slim.min.js"></script>
+
     <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-annotation/2.5.1/d3-annotation.min.js"></script>
+    <script src="./jeezy.min.js"></script>
     <style>
         body {
             font: 10px sans-serif;
+        }
+
+        .content {
+            padding: 10px 20px;
         }
 
         .axis path,
@@ -19,59 +30,513 @@
             display: none;
         }
 
+        rect.selected {
+            stroke: #000;
+            stroke-width: 2px;
+        }
+
+        .annotation-note-label tspan,
+        .annotation-note-title tspan {
+            text-shadow: -2px -2px 2px #ffffff, -2px 0px 2px #ffffff, -2px 2px 2px #ffffff, 0px -2px 2px #ffffff, 0px 2px 2px #ffffff, 2px -2px 2px #ffffff, 2px 0px 2px #ffffff, 2px 2px 2px #ffffff;
+        }
+
+        .annotation-note-bg {
+            fill: rgba(255, 0, 0, 0);
+        }
+
+        .my_tooltip {
+            text-shadow: -2px -2px 2px #ffffff, -2px 0px 2px #ffffff, -2px 2px 2px #ffffff, 0px -2px 2px #ffffff, 0px 2px 2px #ffffff, 2px -2px 2px #ffffff, 2px 0px 2px #ffffff, 2px 2px 2px #ffffff;
+            pointer-events: none;
+        }
+
         .line {
             fill: none;
             stroke: steelblue;
             stroke-width: 1.5px;
         }
+
+        .column {
+            float: left;
+            width: 280px;
+            margin-left: 20px;
+        }
+
+        /* Clear floats after the columns */
+        .row:after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+
+        .width100 {
+            width: 150px;
+        }
     </style>
 </head>
 
-<body onload="init()">
+<body>
 
-<div>
-    <h1>
-        COVID19 Correlation Analysis
-    </h1>
-    <div>
-        <pre>
-    Nowadays, there are tremendous news about COVID19,
-    but mostly of them just say here is a number of confirmed new cases.
-    Even though, no matter the reason is, people should be careful for the COVID19 prevention,
-    Sometimes one might be curious about the reason or the correlation about the several variables.
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="#">COVID19 Correlation Analysis in South Korea</a>
+</nav>
 
-    For example, if Delta variants has the strong correlation with the new cases,
-    one might can be examine the characters of the Delta variants.
-
-    Correlation does not simply imply causation but it help provides a hint.
-    Let's find correlation of integrated Covid19 Information.
-
-    Each parts has differenct characters, so I split it up for the drop down.
-        </pre>
+<div class="content">
+    <div style="padding-top: 10px">
+        <button type="button" class="btn btn-info width100" id="btn_period0">(0) All</button>
+        <button type="button" class="btn btn-info width100" id="btn_period1">(1) 1st wave</button>
+        <button type="button" class="btn btn-info width100" id="btn_period2">(2) 2nd wave</button>
+        <button type="button" class="btn btn-info width100" id="btn_period3">(3) 3rd wave</button>
+        <button type="button" class="btn btn-info width100" id="btn_period4">(4) 4th wave</button>
     </div>
+
+    <div >
+        <div class="row justify-content-start" style="padding-left: 20px">
+            <span style="width: 300px; padding-right:30px; padding-top:20px">
+                Nowadays, there is a lot of COVID19 news,
+                but most of them just say the number of confirmed cases of recent days.
+                No matter what the reason is, people should follow COVID19 guidelines.
+                Sometimes, however, one might be curious about the soaring reason or the relationships between variables.
+
+                <b>Correlation does not simply imply causation</b> but it helps provides a hint;
+                let's find out what variables are highly correlated.
+                Interpretation will be vary on the situation.
+
+                <p></p>
+                <div style="font-size: 13px">
+                    - Dates: <span id="stat_from"></span> ~ <span id="stat_to"></span> (<span id="total_days"></span> Days)<br>
+                    - New cases: <span id="stat_total_new_cases"></span> (Mean: <span id="stat_avg_new_cases"></span>)<br>
+                    - Positive w/ NewCase: <span id="stat_positive_var"></span><br>
+                    - Negative w/ NewCase: <span id="stat_negative_var"></span><br>
+                </div>
+            </span>
+            <span style="width: 270px; padding-top:20px">
+                <svg id="chart_corr"></svg>
+            </span>
+            <span style="width: 100px; padding-top:20px">
+                <div>
+                    <div style="padding-bottom: 2px">
+                        <button type="button" class="btn btn-secondary btn-sm">Toggle All</button>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="age_check1">
+                        <label class="form-check-label" for="age_check1" style="line-height: 2.25">
+                            age (0~9)
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="age_check2">
+                        <label class="form-check-label" for="age_check2" style="line-height: 2.25">
+                            age (10~19)
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="age_check3">
+                        <label class="form-check-label" for="age_check3" style="line-height: 2.25">
+                            age (20~29)
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="age_check4">
+                        <label class="form-check-label" for="age_check4" style="line-height: 2.25">
+                            age (30~39)
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="age_check5">
+                        <label class="form-check-label" for="age_check5" style="line-height: 2.25">
+                            age (40~49)
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="age_check6">
+                        <label class="form-check-label" for="age_check6" style="line-height: 2.25">
+                            age (50~59)
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="age_check7">
+                        <label class="form-check-label" for="age_check7" style="line-height: 2.25">
+                            age (60~69)
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="age_check8">
+                        <label class="form-check-label" for="age_check8" style="line-height: 2.25">
+                            age (70~79)
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="age_check9">
+                        <label class="form-check-label" for="age_check9" style="line-height: 2.25">
+                            age (80+)
+                        </label>
+                    </div>
+                </div>
+            </span>
+            <span style="width: 130px; padding-top:20px">
+                <div>
+                    <div style="padding-bottom: 2px">
+                        <button type="button" class="btn btn-secondary btn-sm">Toggle All</button>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="variantCheck1">
+                        <label class="form-check-label" for="variantCheck1" style="line-height: 2.25">
+                            Others
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="variantCheck2">
+                        <label class="form-check-label" for="variantCheck2" style="line-height: 2.25">
+                            Alpha
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="variantCheck3">
+                        <label class="form-check-label" for="variantCheck3" style="line-height: 2.25">
+                            Delta
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="variantCheck4">
+                        <label class="form-check-label" for="variantCheck4" style="line-height: 2.25">
+                            B.1.620
+
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="variantCheck5">
+                        <label class="form-check-label" for="variantCheck5" style="line-height: 2.25">
+                            Epsilon
+                        </label>
+                    </div>
+                </div>
+            </span>
+        </div>
+    </div>
+
+    <svg id="chart_new_cases"></svg>
+    <svg id="chart_new_tests"></svg><br>
+    <svg id="chart_new_deaths"></svg>
+    <svg id="chart_new_people_vaccinated"></svg><br>
+    <svg id="chart_age"></svg>
+    <svg id="chart_variants"></svg>
 </div>
-<svg id="chart_new_cases"></svg>
-<svg id="chart_new_tests"></svg>
-<svg id="chart_new_deaths"></svg>
-<svg id="chart_new_people_vaccinated"></svg>
-<svg id="chart_age"></svg>
-<svg id="chart_variants"></svg>
 
 <script>
-async function init() {
-    // Source: COVID-19 (coronavirus) by Our World in Data
-    // https://github.com/owid/covid-19-data/tree/master/public/data
-    const data = await d3.csv('./covid_kor_all.csv');
+    $(document).ready(function(){
+        $("#btn_period0").click(() =>  window.location.href='./?wave_no=0');
+        $("#btn_period1").click(() =>  window.location.href='./?wave_no=1');
+        $("#btn_period2").click(() =>  window.location.href='./?wave_no=2');
+        $("#btn_period3").click(() =>  window.location.href='./?wave_no=3');
+        $("#btn_period4").click(() =>  window.location.href='./?wave_no=4');
 
-    var top_margin = 0;
-    var margin = 50;
-    var width = 600;
-    var height = 100;
+        cols = ["new_cases", "new_tests", "new_deaths", "new_people_vaccinated"];
+        cols = cols.concat(["new_age_0-9_conf_case", "new_age_10-19_conf_case", "new_age_20-29_conf_case", "new_age_30-39_conf_case", "new_age_40-49_conf_case", "new_age_50-59_conf_case", "new_age_60-69_conf_case", "new_age_70-79_conf_case", "new_age_over-80_conf_case"]);
+        cols = cols.concat(["var_others_num", "var_Alpha_num", "var_Delta_num", "var_B.1.620_num", "var_Epsilon_num"]);
 
-    var parseTime = d3.timeParse("%Y-%m-%d");
+        cols_names = ["cases", "tests", "deaths", "vaccine"];
+        cols_names = cols_names.concat(["age 0-9", "age 10-19", "age 20-29", "age 30-39", "age 40-49", "age 50-59", "age 60-69", "age 70-79", "age 80+"]);
+        cols_names = cols_names.concat(["others", "Alpha", "Delta", "B.1.620", "Epsilon"]);
 
-    function drawChart(column_name, chart_id, has_x_axis, chart_title) {
-        var state_date = data.map((v) => { return v['date']; })
+        column_abbr_map = {}
+        for (var i=0; i < cols.length; i++) {
+            column_abbr_map[cols[i]] = cols_names[i];
+        }
+
+        init(column_abbr_map);
+    });
+
+    function num_prefix(no) {
+        if (no == 1) {
+            return "1st";
+        } else if (no == 2) {
+            return "2nd";
+        } else if (no == 3) {
+            return "3rd";
+        } else {
+            return no + "th";
+        }
+    }
+
+    // Convert Number to Comma Separated String
+    // https://jmseo.tistory.com/5
+    function comma(str) {
+        str = String(str);
+        return str.replace(/(\d)(?=(?:\d{3})+(?!\d))/g, '$1,');
+    }
+
+    // get URL parameter using jquery
+    // https://stackoverflow.com/questions/19491336/how-to-get-url-parameter-using-jquery-or-plain-javascript
+    var getUrlParameter = function getUrlParameter(sParam) {
+        var sPageURL = window.location.search.substring(1),
+            sURLVariables = sPageURL.split('&'),
+            sParameterName,
+            i;
+
+        for (i = 0; i < sURLVariables.length; i++) {
+            sParameterName = sURLVariables[i].split('=');
+
+            if (sParameterName[0] === sParam) {
+                return typeof sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+            }
+        }
+        return false;
+    };
+
+    function filterData(data) {
+        const queryString = window.location.search;
+        var start = "";
+        var end = "";
+        if (queryString == "") {
+            start = data[0].date;
+            end = data[data.length-1].date;
+        } else {
+            const wave_no = getUrlParameter('wave_no');
+            console.log('wave_no:', wave_no);
+            var parseTime = d3.timeParse("%Y-%m-%d");
+            if (wave_no == "1") {
+                start = '2020-02-20';
+                end = '2020-03-09';
+            } else if (wave_no == "2") {
+                start = '2020-08-13';
+                end = '2020-09-18';
+            } else if (wave_no == "3") {
+                start = '2020-11-20';
+                end = '2021-01-20';
+            } else if (wave_no == "4") {
+                start = '2021-07-01';
+                end = '2021-07-23';
+            } else {
+                start = data[0].date;
+                end = data[data.length-1].date;
+            }
+            data = data.filter(function(d){
+                return parseTime(d.date).getTime() >= parseTime(start).getTime() &&
+                    parseTime(d.date).getTime() <= parseTime(end).getTime();
+            });
+        }
+        $("#stat_from").html(start);
+        $("#stat_to").html(end);
+        $("#total_days").html(data.length);
+
+        var sum = 0;
+        data.forEach(function(d) {
+            new_cases = +d["new_cases"];
+            sum += new_cases;
+        });
+        $("#stat_total_new_cases").html(comma(sum));
+        $("#stat_avg_new_cases").html(comma((sum/data.length).toFixed(2)));
+
+        return data;
+    }
+
+    function updateCorrelation(data, column_abbr_map) {
+        data_corr = []
+        cols = ["new_cases", "new_tests", "new_deaths", "new_people_vaccinated"];
+        cols = cols.concat(["new_age_0-9_conf_case", "new_age_10-19_conf_case", "new_age_20-29_conf_case", "new_age_30-39_conf_case", "new_age_40-49_conf_case", "new_age_50-59_conf_case", "new_age_60-69_conf_case", "new_age_70-79_conf_case", "new_age_over-80_conf_case"]);
+        cols = cols.concat(["var_others_num", "var_Alpha_num", "var_Delta_num", "var_B.1.620_num", "var_Epsilon_num"]);
+
+        for (var i = 0; i < data.length; i++){
+            var obj = {index: i};
+            cols.forEach(col => {
+                if (data[i][col] == "") {
+                    obj[col] = 0;
+                } else {
+                    obj[col] = +data[i][col];
+                }
+            });
+            data_corr.push(obj);
+        }
+        var corr = jz.arr.correlationMatrix(data_corr, cols);
+
+        var new_cases_corr = corr.filter(d => d.column_x == "new_cases" && d.column_y != "new_cases");
+        var extent = d3.extent(new_cases_corr.map(function(d){ return d.correlation; }));
+        var min_obj = new_cases_corr.find(d => d.correlation == extent[0]);
+        var max_obj = new_cases_corr.find(d => d.correlation == extent[1]);
+        var strong_var = column_abbr_map[min_obj.column_y];
+        var weak_var = column_abbr_map[max_obj.column_y];
+        $("#stat_negative_var").html(strong_var + " (" + extent[0].toFixed(3) + ")");
+        $("#stat_positive_var").html(weak_var + " (" + extent[1].toFixed(3) + ")");
+
+        return {
+            corr: corr,
+            cols: cols,
+            cols_name: cols_names
+        }
+    }
+
+    // https://bl.ocks.org/HarryStevens/302d078a089caf5aeb13e480b86fdaeb
+    function drawCorrelationMatrix(data, corr, cols, box_size, chart_id) {
+        // var extent = d3.extent(corr.map(function(d){ return d.correlation; }).filter(function(d){ return d !== 1; }));
+        var extent = d3.extent(corr.map(function(d){ return d.correlation; }));
+
+        // normalize correlation value to 0~1
+        // https://stackoverflow.com/questions/39776819/function-to-normalize-any-number-from-0-1
+        function normalize(min, max) {
+            var delta = max - min;
+            return function (val) {
+                return (val.correlation - min) / delta;
+            };
+        }
+        normalized_corr = corr.map(normalize(extent[0], extent[1])); // 0~1
+
+        var legend_left_width = 50;
+        var tooltip_right_margin = 60;
+        var number_of_vars = Math.sqrt(corr.length);
+        var top_legend_margin = (box_size * 3);
+        var width = box_size * number_of_vars + legend_left_width + tooltip_right_margin;
+        var height = top_legend_margin + box_size * number_of_vars + 60;
+
+        var vis = d3.select(chart_id)
+            .attr("width", width)
+            .attr("height", height);
+
+        // https://github.com/d3/d3-scale-chromatic#interpolateRdBu
+        var piyg = d3.scaleSequential(d3.interpolateRdBu);
+
+        vis.append("g")
+            .attr("transform", "translate(" + legend_left_width + "," + 0 + ")")
+            .selectAll("rect").data(corr)
+            .enter().append("rect")
+            .attr("class", "corr_rect")
+            .attr("x", function (d, i) {
+                var col = (i % number_of_vars);
+                return col * box_size;
+            })
+            .attr("y", function (d, i) {
+                var row = parseInt(i / number_of_vars);
+                return top_legend_margin + row * box_size;
+            })
+            .attr("width", box_size-1)
+            .attr("height", box_size-1)
+            .style("fill", function(d, i){
+                // console.log(d.correlation, normalized_corr[i], piyg(normalized_corr[i]));
+                return piyg(normalized_corr[i]);
+            })
+
+        // correlation matrix > y label
+        vis.append("g")
+            .attr("transform", "translate(" + 0 + "," + top_legend_margin + ")")
+            .selectAll("text").data(cols)
+            .enter().append("text")
+            .attr("x", legend_left_width-5)
+            .attr("y", function(d, i) { return i * box_size + 8; })
+            .attr("cx", legend_left_width)
+            .attr("height", box_size)
+            .text(function(d, i){ return d; })
+            .attr("text-anchor", "end");
+
+        // correlation matrix > x label
+        // rotate text 45 degrees: https://www.d3-graph-gallery.com/graph/custom_axis.html
+        // The scaleBand() function is ideal to build categorical axis.
+        var x = d3.scaleBand()
+            .domain(cols)
+            .range([legend_left_width, legend_left_width+box_size*(cols.length)-1]);
+
+        // Draw the axis
+        vis.append("g")
+            .attr("transform", "translate(" + 0 + ", " + (top_legend_margin + box_size * cols.length) + ")")
+            .call(
+                d3.axisBottom(x)
+                    .tickSize(0)
+            )
+            .selectAll("text")
+            .attr("transform", "translate(-10,10)rotate(-90)")
+            .attr("text-anchor", "end")
+            .attr("x", 6)
+            .attr("y", 5)
+            .attr("dy", "0.8em")
+        ;
+
+        // correlation matrix legend
+        var legend_height = box_size;
+        var legend_svg = vis
+            .append("g")
+            .attr("transform", "translate(" + legend_left_width + ", " + 10 + ")");
+
+        var defs = legend_svg.append("defs");
+        var gradient = defs.append("linearGradient").attr("id", "linear-gradient");
+
+        min = extent[0];
+        max = extent[1];
+        normalized_min = (extent[0] - min) / (max - min); // 0~1
+        normalized_max = (extent[1] - min) / (max - min); // 0~1
+        var stops = [{offset: 0, color: piyg(0), value: extent[0]}, {offset: .5, color: "white", value: 0}, {offset: 1, color: piyg(1), value: extent[1]}];
+
+        gradient.selectAll("stop")
+            .data(stops)
+            .enter().append("stop")
+            .attr("offset", function(d){ return (100 * d.offset) + "%"; })
+            .attr("stop-color", function(d){ return d.color; });
+
+        legend_svg.append("rect")
+            .attr("width", width-legend_left_width-tooltip_right_margin)
+            .attr("height", legend_height)
+            .attr("y", 5)
+            .data(corr)
+            .style("fill", "url(#linear-gradient)");
+
+        legend_svg.selectAll("text")
+            .data(stops)
+            .enter().append("text")
+            .attr("x", function(d){ return (width-legend_left_width-tooltip_right_margin) * d.offset; })
+            .attr("y", 0)
+            .style("text-anchor", function(d, i){ return i == 0 ? "start" : i == 1 ? "middle" : "end"; })
+            .text(function(d, i){ return d.value.toFixed(2); });
+
+        // create a tooltip
+        var tooltip = d3.select(chart_id)
+            .append("g")
+            .attr("transform", "translate(" + 0 + ", " + 0 + ")")
+            .append("text")
+            .attr("class", "my_tooltip")
+            .style("visibility", "hidden")
+            .text("")
+            .attr("x", 0)
+            .attr("y", 0);
+
+        // tooltip
+        d3.selectAll(".corr_rect")
+            .on("mouseover", function(d){
+                d.column_x = this.__data__.column_x;
+                d.column_y = this.__data__.column_y;
+                d.correlation = this.__data__.correlation;
+                var row_pos = parseInt((d.offsetY-top_legend_margin) / box_size);
+                var col_pos = parseInt((d.offsetX-legend_left_width) / box_size);
+
+                var row_name = cols[row_pos];
+                var col_name = cols[col_pos];
+
+                var x_pos_idx = col_pos;
+                if (x_pos_idx < 3) {
+                    x_pos_idx = 3;
+                }
+                if (x_pos_idx >= cols_names.length-2) {
+                    x_pos_idx = cols_names.length-3;
+                }
+                var x_pos = legend_left_width + x_pos_idx * box_size - 50;
+
+                d3.select(this).classed("selected", true);
+
+                return tooltip
+                    .style("visibility", "visible")
+                    .html(row_name + "/" + col_name + ": " + d.correlation.toFixed(2))
+                    .attr("x", x_pos)
+                    .attr("y", top_legend_margin + row_pos * box_size - 5);
+            })
+            .on("mouseout", function(){
+                d3.selectAll("rect").classed("selected", false);
+                return tooltip.style("visibility", "hidden");
+            });
+    }
+
+    function drawChart(data, chart_size, column_name, chart_id, has_x_axis, chart_title) {
+        var parseTime = d3.timeParse("%Y-%m-%d");
+        var width = chart_size.width;
+        var height = chart_size.height;
+        var margin = chart_size.margin;
+        var top_margin = chart_size.top_margin;
+
         var new_cases = data.map((x) => { let v = x[column_name]; if (v == "") return 0; return Number.parseInt(v); })
         var max_val = new_cases.reduce((a, b) => Math.max(a, b), 0);
         console.log(column_name + "'s max value: " + max_val);
@@ -81,7 +546,7 @@ async function init() {
             dates.push(parseTime(obj.date));
         }
         var domain = d3.extent(dates); // date: from ~ to
-        domain[1] = parseTime('2021-08-01'); // set end date to 2021-08-01
+        // domain[1] = parseTime('2021-08-01'); // set end date to 2021-08-01
         var xScale = d3.scaleTime().domain(domain).range([0, width]);
         var xAxis = d3.axisBottom(xScale);
 
@@ -100,14 +565,15 @@ async function init() {
             .attr("transform", "translate(" + margin + "," + top_margin + ")")
             .selectAll("rect").data(data)
             .enter().append("rect")
-            .attr("x", function (d, i) {
-                return x(i);
-            })
+            .attr("x", function (d, i) { return x(i); })
             .attr("y", function (d) {
                 return y(d[column_name]);
             })
-            .attr("width", 1)
+            .attr("width", width/data.length)
             .attr("height", function (d) {
+                if (d[column_name] == 0) {
+                    return 0;
+                }
                 return ys(d[column_name]);
             })
             .style("fill", "steelblue");
@@ -119,7 +585,7 @@ async function init() {
             .join("text")
             .text(chart_title)
             .attr("x", margin + 10)
-            .attr("y", 10)
+            .attr("y", top_margin + 10)
             .attr("font-weight", "bold")
         ;
 
@@ -156,13 +622,55 @@ async function init() {
                 );
         }
 
+        // annotation
+        const type = d3.annotationLabel // annotationLabel, annotationCalloutElbow
+        var annotations = []
+        var peak_dates = ['2020-03-03', '2020-08-26', '2020-12-24', '2021-07-21']
+        for (var i=0; i < peak_dates.length; i++) {
+            const peak_date = peak_dates[i];
+            const wave_start = data.find(d => d.date == peak_date);
+            const wave_start_idx = data.findIndex(d => d.date == peak_date);
+            if (wave_start_idx >= 0) {
+                var annotation_val = wave_start[column_name];
+                if (annotation_val == "") {
+                    annotation_val = "N/A";
+                }
+                annotations.push({
+                    note: {label: annotation_val, bgPadding: 0, title: num_prefix(i + 1) + " wave"},
+                    className: "show-bg",
+                    x: x(wave_start_idx) + margin,
+                    y: y(wave_start[column_name]) + top_margin,
+                    dy: -10,
+                    dx: -10,
+                    connector: {end: "dot"}
+                })
+            }
+        }
+
+        const makeAnnotations = d3.annotation()
+            .notePadding(0)
+            .type(type)
+            .annotations(annotations)
+
+        vis.append("g")
+            .attr("class", "annotation-group")
+            .call(makeAnnotations)
+
         return vis;
     }
 
-    function drawLineChart(data, column_names, chart_id, has_x_axis, chart_title) {
+    function drawLineChart(data, chart_size, column_names, legends, chart_id, has_x_axis, chart_title) {
+        var parseTime = d3.timeParse("%Y-%m-%d");
+        var width = chart_size.width;
+        var height = chart_size.height;
+        var margin = chart_size.margin;
+        var top_margin = chart_size.top_margin;
+
         // format the data
+        var dates = [];
         data.forEach(function(d) {
             d.date = parseTime(d.date);
+            dates.push(d.date);
             column_names.forEach(function(col) {
                 d[col] = +d[col];
             });
@@ -173,11 +681,12 @@ async function init() {
             .attr("height", height + top_margin + margin);
 
         var svg = vis.append("g")
-            .attr("transform", "translate(" + margin + "," + top_margin + ")")
+            .attr("transform", "translate(" + margin + "," + top_margin + ")");
 
         // set the ranges
         var x = d3.scaleTime().range([0, width]);
         var y = d3.scaleLinear().range([height, 0]);
+        var z = d3.scaleOrdinal(d3.schemeCategory10);
 
         // define the 1st line
         var valuelines = [];
@@ -202,78 +711,321 @@ async function init() {
         })]);
 
         // Add the valueline path.
+        line_colors = [];
         valuelines.forEach(function(valueline) {
             svg.append("path")
                 .data([data])
                 .attr("class", "line")
-                .attr("d", valueline);
+                .attr("d", valueline)
+                .style("stroke", function(d, i) {
+                    color = z(valueline);
+                    line_colors.push(color);
+                    return color;
+                });
         });
 
-        // Add the X Axis
+        // x axis
+        var domain = d3.extent(dates); // date: from ~ to
+        var xScale = d3.scaleTime().domain(domain).range([0, width]);
+        var xAxis = d3.axisBottom(xScale);
+        d3.select(chart_id)
+            .append("g")
+            .attr("class", "xaxis")
+            .attr("transform", "translate(" + margin + "," + (height + top_margin) + ")")
+            .call(
+                xAxis.ticks(d3.timeMonth)
+                    .tickFormat(d3.timeFormat("%Y-%m-%d"))
+            );
+
+        // x axix > rotate 45 degrees
+        vis.selectAll(".xaxis text")
+            .attr("transform", function (d) {
+                return "translate(" + this.getBBox().height * -2 + "," + this.getBBox().height + ")rotate(-45)";
+            });
+
+        // y axis
         svg.append("g")
-            .attr("transform", "translate(0," + height + ")")
-            .call(d3.axisBottom(x));
+            .call(d3.axisLeft(y));
+
+        // label
+        svg.append("g")
+            .selectAll("text")
+            .data(d => [""])
+            .join("text")
+            .text(chart_title)
+            .attr("x", 10)
+            .attr("y", 10)
+            .attr("font-weight", "bold")
+        ;
+
+        // legend
+        font_size = 20
+        svg.selectAll(chart_title + "_labels")
+            .data(legends)
+            .enter()
+            .append("text")
+            .attr("x", width+5)
+            .attr("y", function(d, i){ return 10 + i*(font_size)})
+            .style("fill", function(d, i){ return line_colors[i]})
+            .text(function(d){ return d})
+            .attr("text-anchor", "left");
+
+        // annotation
+        const type = d3.annotationLabel // annotationLabel, annotationCalloutElbow
+        var annotations = []
+        var peak_dates = ['2020-03-03', '2020-08-26', '2020-12-24', '2021-07-21']
+        for (var i=0; i < peak_dates.length; i++) {
+            const peak_date = peak_dates[i];
+            const wave_start = data.find(d => d.date.getTime() == parseTime(peak_date).getTime());
+            const wave_start_idx = data.findIndex(d => d.date.getTime() == parseTime(peak_date).getTime());
+            if (wave_start_idx >= 0) {
+                var y_max = 0;
+                column_names.forEach(function (col) {
+                    if (+wave_start[col] > y_max) {
+                        y_max = +wave_start[col];
+                    }
+                });
+                annotations.push({
+                    note: {label: "", bgPadding: 0, title: num_prefix(i + 1) + " wave"},
+                    className: "show-bg",
+                    x: x(parseTime(peak_date)) + margin,
+                    y: y(y_max) + top_margin,
+                    dy: -10,
+                    dx: -10,
+                    connector: {end: "dot"}
+                })
+            }
+        }
+
+        const makeAnnotations = d3.annotation()
+            .notePadding(0)
+            .type(type)
+            .annotations(annotations)
+
+        vis.append("g")
+            .attr("class", "annotation-group")
+            .call(makeAnnotations)
+    }
+
+    // https://bl.ocks.org/DimsumPanda/689368252f55179e12185e13c5ed1fee
+    function drawStackedBarChart(data, chart_size, column_names, legends, chart_id, has_x_axis, chart_title) {
+        var parseTime = d3.timeParse("%Y-%m-%d");
+        var width = chart_size.width;
+        var height = chart_size.height;
+        var margin = chart_size.margin;
+        var top_margin = chart_size.top_margin;
+
+        // format the data
+        var dates = [];
+        data.forEach(function(d) {
+            dates.push(d.date);
+            var total = 0;
+            column_names.forEach(function(col) {
+                total += +d[col];
+            });
+            d.total = total;
+        });
+        // data.sort(function(a, b) { return b.total - a.total; });
+
+        var domain = d3.extent(dates); // date: from ~ to
+        // domain[1] = parseTime('2021-08-01'); // set end date to 2021-08-01
+        var xScale = d3.scaleTime().domain(domain).range([0, width]);
+        var xAxis = d3.axisBottom(xScale);
+
+        var vis = d3.select(chart_id)
+            .attr("width", width + 2 * margin)
+            .attr("height", height + top_margin + margin);
+
+        var svg = vis.append("g")
+            .attr("transform", "translate(" + margin + "," + top_margin + ")");
+
+        // Set x, y and colors
+        var x = d3.scaleBand().domain(Array.from(Array(dates.length).keys())).range([0, width]);
+        var y = d3.scaleLinear().rangeRound([height, 0]);
+        var z = d3.scaleOrdinal(d3.schemeCategory10);
+
+        y.domain([0, d3.max(data, function(d) { return d.total; })]).nice();
+
+        var stack = d3.stack();
+        svg.selectAll(".serie")
+            .data(stack.keys(column_names)(data))
+            .enter().append("g")
+            .attr("class", "serie")
+            .attr("fill", function(d) {
+                return z(d.key);
+            })
+            .selectAll("rect")
+            .data(function(d) { return d; })
+            .enter().append("rect")
+            .attr("x", function (d, i) {
+                // console.log(i)
+                return x(i);
+            })
+            .attr("y", function(d) { return y(d[1]); })
+            .attr("height", function(d) {
+                return y(d[0]) - y(d[1]);
+            })
+            .attr("width", 5);
+
+        // x axis
+        var domain = d3.extent(dates); // date: from ~ to
+        var xScale = d3.scaleTime().domain(domain).range([0, width]);
+        var xAxis = d3.axisBottom(xScale);
+        d3.select(chart_id)
+            .append("g")
+            .attr("class", "xaxis")
+            .attr("transform", "translate(" + margin + "," + (height + top_margin) + ")")
+            .call(
+                xAxis.ticks(d3.timeMonth)
+                    .tickFormat(d3.timeFormat("%Y-%m-%d"))
+            );
+
+        // x axix > rotate 45 degrees
+        vis.selectAll(".xaxis text")
+            .attr("transform", function (d) {
+                return "translate(" + this.getBBox().height * -2 + "," + this.getBBox().height + ")rotate(-45)";
+            });
 
         // Add the Y Axis
         svg.append("g")
             .call(d3.axisLeft(y));
+
+        // label
+        svg.append("g")
+            .selectAll("text")
+            .data(d => [""])
+            .join("text")
+            .text(chart_title)
+            .attr("x", 10)
+            .attr("y", 10)
+            .attr("font-weight", "bold")
+        ;
+
+        // legend
+        font_size = 20
+        svg.selectAll(chart_title + "_labels")
+            .data(legends)
+            .enter()
+            .append("text")
+            .attr("x", width+5)
+            .attr("y", function(d, i){ return 10 + i*(font_size)})
+            .style("fill", function(d, i){ return line_colors[i]})
+            .text(function(d){ return d})
+            .attr("text-anchor", "left");
+
+        // annotation
+        const type = d3.annotationLabel // annotationLabel, annotationCalloutElbow
+        var annotations = []
+        var peak_dates = ['2020-03-03', '2020-08-26', '2020-12-24', '2021-07-21']
+        for (var i=0; i < peak_dates.length; i++) {
+            const peak_date = peak_dates[i];
+            const wave_start = data.find(d => d.date.getTime() == parseTime(peak_date).getTime());
+            const wave_start_idx = data.findIndex(d => d.date.getTime() == parseTime(peak_date).getTime());
+            if (wave_start_idx >= 0) {
+                var y_max = wave_start.total;
+                annotations.push({
+                    note: {label: "", bgPadding: 0, title: num_prefix(i + 1) + " wave"},
+                    className: "show-bg", x: x(wave_start_idx) + margin, y: y(y_max) + top_margin, dy: -10, dx: -10,
+                    connector: {end: "dot"}
+                })
+            }
+        }
+
+        const makeAnnotations = d3.annotation()
+            .notePadding(0)
+            .type(type)
+            .annotations(annotations)
+
+        vis.append("g")
+            .attr("class", "annotation-group")
+            .call(makeAnnotations)
     }
 
-    var vis = drawChart('new_cases', '#chart_new_cases', true, 'new_cases');
-    var vis = drawChart('new_tests', '#chart_new_tests', true, 'new_tests');
-    var vis = drawChart('new_deaths', '#chart_new_deaths', true, 'new_deaths');
-    var vis = drawChart('new_people_vaccinated', '#chart_new_people_vaccinated', true, 'new_people_vaccinated');
+    async function init(column_abbr_map) {
+        // Source: COVID-19 (coronavirus) by Our World in Data
+        // https://github.com/owid/covid-19-data/tree/master/public/data
+        const csv_data = await d3.csv('./covid_kor_all.csv');
 
-    // age_0-9_conf_case ~ age_over-80_conf_case
-    drawLineChart(data, ["new_age_0-9_conf_case", "new_age_10-19_conf_case", "new_age_20-29_conf_case", "new_age_over-80_conf_case"], '#chart_age', false, 'age');
+        const data = filterData(csv_data);
 
-    // var_sequences_total만 빼고 var_...
+        calculatedColumnsInfo = updateCorrelation(data, column_abbr_map);
+        corr = calculatedColumnsInfo.corr;
+        cols = calculatedColumnsInfo.cols;
+        cols_name = calculatedColumnsInfo.cols_name;
 
-    //////////////////////////////////////////////////
-    // mouse actions
-    //////////////////////////////////////////////////
-    var color = d3.scaleOrdinal(d3.schemeCategory10);
-    var mouseG = vis.append("g")
-        .attr("class", "mouse-over-effects");
+        // correlation matrix
+        const box_size = 10;
+        drawCorrelationMatrix(data, corr, cols_names, box_size, "#chart_corr");
 
-    mouseG.append("path") // this is the black vertical line to follow mouse
-        .attr("class", "mouse-line")
-        .style("stroke", "black")
-        .style("stroke-width", "1px")
-        .style("opacity", "0");
+        var chart_size = {
+            width: 300,
+            height: 200,
+            margin: 55,
+            top_margin: 45
+        }
 
-    mouseG.append('svg:rect') // append a rect to catch mouse movements on canvas
-        .attr("transform", "translate(" + margin + "," + top_margin + ")") // 마우스 캡쳐할 영역도 margin 고려해야 함.
-        .attr('width', width) // can't catch mouse events on a g element
-        .attr('height', height)
-        .attr('fill', 'none')
-        .attr('pointer-events', 'all')
-        .on('mouseout', function() { // on mouse out hide line, circles and text
-            d3.select(".mouse-line")
-                .style("opacity", "0");
-            d3.selectAll(".mouse-per-line circle")
-                .style("opacity", "0");
-            d3.selectAll(".mouse-per-line text")
-                .style("opacity", "0");
-        })
-        .on('mouseover', function() { // on mouse in show line, circles and text
-            d3.select(".mouse-line")
-                .style("opacity", "1");
-            d3.selectAll(".mouse-per-line circle")
-                .style("opacity", "1");
-            d3.selectAll(".mouse-per-line text")
-                .style("opacity", "1");
-        })
-        .on('mousemove', function(event) { // mouse moving over canvas
-            var mouse = d3.pointer(event);
-            d3.select(".mouse-line")
-                .attr("d", function() {
-                    var d = "M" + (mouse[0] + margin) + "," + height;
-                    d += " " + (mouse[0] + margin) + "," + 0;
-                    return d;
-                });
-        });
-}
+        var vis = drawChart(data, chart_size, 'new_cases', '#chart_new_cases', true, 'new cases');
+        var vis = drawChart(data, chart_size, 'new_tests', '#chart_new_tests', true, 'new tests');
+        var vis = drawChart(data, chart_size, 'new_deaths', '#chart_new_deaths', true, 'new deaths');
+        var vis = drawChart(data, chart_size, 'new_people_vaccinated', '#chart_new_people_vaccinated', true, 'new people vaccinated');
+
+        // age_0-9_conf_case ~ age_over-80_conf_case
+        drawLineChart(data, chart_size,
+            ["new_age_0-9_conf_case", "new_age_10-19_conf_case", "new_age_20-29_conf_case", "new_age_30-39_conf_case", "new_age_40-49_conf_case", "new_age_50-59_conf_case", "new_age_60-69_conf_case", "new_age_70-79_conf_case", "new_age_over-80_conf_case"],
+            ["age 0-9", "age 10-19", "age 20-29", "age 30-39", "age 40-49", "age 50-59", "age 60-69", "age 70-79", "age 80+"],
+            '#chart_age', false, 'new cases by age');
+
+        // Top 6 Variants
+        drawStackedBarChart(data, chart_size,
+            ["var_others_num", "var_Alpha_num", "var_Delta_num", "var_B.1.620_num", "var_Epsilon_num"],
+            ["others", "Alpha", "Delta", "B.1.620", "Epsilon"],
+            '#chart_variants', false, 'new cases by variants');
+
+        //////////////////////////////////////////////////
+        // mouse actions
+        //////////////////////////////////////////////////
+        // var color = d3.scaleOrdinal(d3.schemeCategory10);
+        // var mouseG = vis.append("g")
+        //     .attr("class", "mouse-over-effects");
+        //
+        // mouseG.append("path") // this is the black vertical line to follow mouse
+        //     .attr("class", "mouse-line")
+        //     .style("stroke", "black")
+        //     .style("stroke-width", "1px")
+        //     .style("opacity", "0");
+        //
+        // mouseG.append('svg:rect') // append a rect to catch mouse movements on canvas
+        //     .attr("transform", "translate(" + margin + "," + top_margin + ")") // 마우스 캡쳐할 영역도 margin 고려해야 함.
+        //     .attr('width', width) // can't catch mouse events on a g element
+        //     .attr('height', height)
+        //     .attr('fill', 'none')
+        //     .attr('pointer-events', 'all')
+        //     .on('mouseout', function() { // on mouse out hide line, circles and text
+        //         d3.select(".mouse-line")
+        //             .style("opacity", "0");
+        //         d3.selectAll(".mouse-per-line circle")
+        //             .style("opacity", "0");
+        //         d3.selectAll(".mouse-per-line text")
+        //             .style("opacity", "0");
+        //     })
+        //     .on('mouseover', function() { // on mouse in show line, circles and text
+        //         d3.select(".mouse-line")
+        //             .style("opacity", "1");
+        //         d3.selectAll(".mouse-per-line circle")
+        //             .style("opacity", "1");
+        //         d3.selectAll(".mouse-per-line text")
+        //             .style("opacity", "1");
+        //     })
+        //     .on('mousemove', function(event) { // mouse moving over canvas
+        //         var mouse = d3.pointer(event);
+        //         d3.select(".mouse-line")
+        //             .attr("d", function() {
+        //                 var d = "M" + (mouse[0] + margin) + "," + height;
+        //                 d += " " + (mouse[0] + margin) + "," + 0;
+        //                 return d;
+        //             });
+        //     });
+    }
 </script>
 
 </body>
