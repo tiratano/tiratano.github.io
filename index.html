@@ -232,7 +232,7 @@
         var browser_name = navigator.userAgent;
         console.log('browser: ', browser_name);
         if (browser_name.indexOf('Chrome') >= 0) {
-            $("#browser_warning").attributes("display", "none");
+            $("#browser_warning").hide();
         }
 
         $("#btn_period0").click(() =>  window.location.href='./?wave_no=0');
