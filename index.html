@@ -81,7 +81,7 @@
 </nav>
 
 <div class="content">
-    <div id="browser_warning" style="display: block">
+    <div id="browser_warning" style="display: block; font-size: large">
         <div class="alert alert-danger" role="alert">
             This website only works in Google Chrome.
         </div>
@@ -233,7 +233,6 @@
         console.log('browser: ', browser_name);
         if (browser_name.indexOf('Chrome') >= 0) {
             $("#browser_warning").attributes("display", "none");
-            return;
         }
 
         $("#btn_period0").click(() =>  window.location.href='./?wave_no=0');
