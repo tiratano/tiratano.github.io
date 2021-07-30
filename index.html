@@ -81,6 +81,11 @@
 </nav>
 
 <div class="content">
+    <div id="browser_warning" style="display: none">
+        <div class="alert alert-danger" role="alert">
+            This website only works in Google Chrome.
+        </div>
+    </div>
     <div style="padding-top: 10px">
         <button type="button" class="btn btn-info width100" id="btn_period0">(0) All</button>
         <button type="button" class="btn btn-info width100" id="btn_period1">(1) 1st wave</button>
@@ -99,7 +104,7 @@
 
                 <b>Correlation does not simply imply causation</b> but it helps provides a hint;
                 let's find out what variables are highly correlated.
-                Interpretation will be vary on the situation.
+                Interpretation will be vary depending on the situation.
 
                 <p></p>
                 <div style="font-size: 13px">
@@ -224,6 +229,13 @@
 
 <script>
     $(document).ready(function(){
+        var browser_name = navigator.userAgent;
+        console.log('browser: ', browser_name);
+        if (browser_name.indexOf('Chrome') < 0) {
+            $("#browser_warning").attributes("display", "block");
+            return;
+        }
+
         $("#btn_period0").click(() =>  window.location.href='./?wave_no=0');
         $("#btn_period1").click(() =>  window.location.href='./?wave_no=1');
         $("#btn_period2").click(() =>  window.location.href='./?wave_no=2');
