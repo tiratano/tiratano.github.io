@@ -45,8 +45,15 @@
         }
 
         .my_tooltip {
-            text-shadow: -2px -2px 2px #ffffff, -2px 0px 2px #ffffff, -2px 2px 2px #ffffff, 0px -2px 2px #ffffff, 0px 2px 2px #ffffff, 2px -2px 2px #ffffff, 2px 0px 2px #ffffff, 2px 2px 2px #ffffff;
+            /*text-shadow: -2px -2px 2px #ffffff, -2px 0px 2px #ffffff, -2px 2px 2px #ffffff, 0px -2px 2px #ffffff, 0px 2px 2px #ffffff, 2px -2px 2px #ffffff, 2px 0px 2px #ffffff, 2px 2px 2px #ffffff;*/
             pointer-events: none;
+            position: absolute;
+            background: lightsteelblue;
+            /*width: 60px;*/
+            /*height: 38px;*/
+            padding: 4px;
+            border: 0px;
+            border-radius: 8px;
         }
 
         .line {
@@ -96,7 +103,7 @@
 
     <div >
         <div class="row justify-content-start" style="padding-left: 20px">
-            <span style="width: 300px; padding-right:30px; padding-top:20px">
+            <span style="width: 350px; padding-right:30px; padding-top:20px">
                 Nowadays, there is a lot of COVID19 news,
                 but most of them just say the number of confirmed cases of recent days.
                 No matter what the reason is, people should follow COVID19 guidelines.
@@ -108,111 +115,25 @@
 
                 <p></p>
                 <div style="font-size: 13px">
-                    - Dates: <span id="stat_from"></span> ~ <span id="stat_to"></span> (<span id="total_days"></span> Days)<br>
+                    - Days: <span id="total_days"></span><br>
                     - New cases: <span id="stat_total_new_cases"></span> (Mean: <span id="stat_avg_new_cases"></span>)<br>
                     - Positive w/ NewCase: <span id="stat_positive_var"></span><br>
                     - Negative w/ NewCase: <span id="stat_negative_var"></span><br>
                 </div>
             </span>
-            <span style="width: 270px; padding-top:20px">
+            <span style="width: 280px; padding-top:20px">
                 <svg id="chart_corr"></svg>
             </span>
-            <span style="width: 100px; padding-top:20px">
+            <span style="width: 150px; padding-top:20px">
                 <div>
                     <div style="padding-bottom: 2px">
-                        <button type="button" class="btn btn-secondary btn-sm">Toggle All</button>
+                        <input type="text" class="form-control" style="width: 120px" id="stat_from" placeholder="YYYY-MM-DD">
                     </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="age_check1">
-                        <label class="form-check-label" for="age_check1" style="line-height: 2.25">
-                            age (0~9)
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="age_check2">
-                        <label class="form-check-label" for="age_check2" style="line-height: 2.25">
-                            age (10~19)
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="age_check3">
-                        <label class="form-check-label" for="age_check3" style="line-height: 2.25">
-                            age (20~29)
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="age_check4">
-                        <label class="form-check-label" for="age_check4" style="line-height: 2.25">
-                            age (30~39)
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="age_check5">
-                        <label class="form-check-label" for="age_check5" style="line-height: 2.25">
-                            age (40~49)
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="age_check6">
-                        <label class="form-check-label" for="age_check6" style="line-height: 2.25">
-                            age (50~59)
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="age_check7">
-                        <label class="form-check-label" for="age_check7" style="line-height: 2.25">
-                            age (60~69)
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="age_check8">
-                        <label class="form-check-label" for="age_check8" style="line-height: 2.25">
-                            age (70~79)
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="age_check9">
-                        <label class="form-check-label" for="age_check9" style="line-height: 2.25">
-                            age (80+)
-                        </label>
-                    </div>
-                </div>
-            </span>
-            <span style="width: 130px; padding-top:20px">
-                <div>
                     <div style="padding-bottom: 2px">
-                        <button type="button" class="btn btn-secondary btn-sm">Toggle All</button>
+                        <input type="text" class="form-control" style="width: 120px" id="stat_to" placeholder="YYYY-MM-DD">
                     </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="variantCheck1">
-                        <label class="form-check-label" for="variantCheck1" style="line-height: 2.25">
-                            Others
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="variantCheck2">
-                        <label class="form-check-label" for="variantCheck2" style="line-height: 2.25">
-                            Alpha
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="variantCheck3">
-                        <label class="form-check-label" for="variantCheck3" style="line-height: 2.25">
-                            Delta
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="variantCheck4">
-                        <label class="form-check-label" for="variantCheck4" style="line-height: 2.25">
-                            B.1.620
-
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="variantCheck5">
-                        <label class="form-check-label" for="variantCheck5" style="line-height: 2.25">
-                            Epsilon
-                        </label>
+                    <div style="padding-bottom: 2px">
+                        <button type="button" class="btn btn-secondary btn-sm" id="applyPeriod" style="width: 120px">Apply</button>
                     </div>
                 </div>
             </span>
@@ -235,6 +156,15 @@
             $("#browser_warning").hide();
         }
 
+        var ageAllChecked = true;
+        for (var i=1; i <= 9; i++) {
+            $("#age_check" + i).prop("checked", ageAllChecked);
+        }
+        var variantAllChecked = true;
+        for (var i=1; i <= 5; i++) {
+            $("#variantCheck" + i).prop("checked", variantAllChecked);
+        }
+
         $("#btn_period0").click(() =>  window.location.href='./?wave_no=0');
         $("#btn_period1").click(() =>  window.location.href='./?wave_no=1');
         $("#btn_period2").click(() =>  window.location.href='./?wave_no=2');
@@ -254,8 +184,57 @@
             column_abbr_map[cols[i]] = cols_names[i];
         }
 
+        target_cols = cols;
+        $("#applyPeriod").click(() => {
+            start = $("#stat_from").val();
+            end = $("#stat_to").val();
+
+            filteredData = filterData(global_data, start, end);
+            updateCorr(filteredData);
+
+            var chart_size = {
+                width: 300,
+                height: 200,
+                margin: 55,
+                top_margin: 45
+            }
+
+            var vis = drawChart(filteredData, chart_size, 'new_cases', '#chart_new_cases', true, 'new cases');
+            var vis = drawChart(filteredData, chart_size, 'new_tests', '#chart_new_tests', true, 'new tests');
+            var vis = drawChart(filteredData, chart_size, 'new_deaths', '#chart_new_deaths', true, 'new deaths');
+            var vis = drawChart(filteredData, chart_size, 'new_people_vaccinated', '#chart_new_people_vaccinated', true, 'new people vaccinated');
+
+            // age_0-9_conf_case ~ age_over-80_conf_case
+            drawLineChart(filteredData, chart_size, column_abbr_map,
+                ["new_age_0-9_conf_case", "new_age_10-19_conf_case", "new_age_20-29_conf_case", "new_age_30-39_conf_case", "new_age_40-49_conf_case", "new_age_50-59_conf_case", "new_age_60-69_conf_case", "new_age_70-79_conf_case", "new_age_over-80_conf_case"],
+                ["age 0-9", "age 10-19", "age 20-29", "age 30-39", "age 40-49", "age 50-59", "age 60-69", "age 70-79", "age 80+"],
+                '#chart_age', false, 'new cases by age');
+
+            // Top 6 Variants
+            drawStackedBarChart(filteredData, chart_size,
+                ["var_others_num", "var_Alpha_num", "var_Delta_num", "var_B.1.620_num", "var_Epsilon_num"],
+                ["others", "Alpha", "Delta", "B.1.620", "Epsilon"],
+                '#chart_variants', false, 'new cases by variants');
+        });
+
         init(column_abbr_map);
     });
+
+    // JavaScript date to yyyy-mm-dd
+    // https://stackoverflow.com/questions/23593052/format-javascript-date-as-yyyy-mm-dd
+    function formatDateToYYYYMMDD(date) {
+        var d = new Date(date),
+            month = '' + (d.getMonth() + 1),
+            day = '' + d.getDate(),
+            year = d.getFullYear();
+
+        if (month.length < 2)
+            month = '0' + month;
+        if (day.length < 2)
+            day = '0' + day;
+
+        return [year, month, day].join('-');
+    }
 
     function num_prefix(no) {
         if (no == 1) {
@@ -294,17 +273,14 @@
         return false;
     };
 
-    function filterData(data) {
+    function getStartEndFromUrl() {
         const queryString = window.location.search;
-        var start = "";
-        var end = "";
         if (queryString == "") {
-            start = data[0].date;
-            end = data[data.length-1].date;
+            start = global_data[0].date;
+            end = global_data[global_data.length-1].date;
         } else {
             const wave_no = getUrlParameter('wave_no');
             console.log('wave_no:', wave_no);
-            var parseTime = d3.timeParse("%Y-%m-%d");
             if (wave_no == "1") {
                 start = '2020-02-20';
                 end = '2020-03-09';
@@ -318,16 +294,29 @@
                 start = '2021-07-01';
                 end = '2021-07-23';
             } else {
-                start = data[0].date;
-                end = data[data.length-1].date;
+                start = global_data[0].date;
+                end = global_data[global_data.length-1].date;
             }
-            data = data.filter(function(d){
-                return parseTime(d.date).getTime() >= parseTime(start).getTime() &&
-                    parseTime(d.date).getTime() <= parseTime(end).getTime();
-            });
         }
-        $("#stat_from").html(start);
-        $("#stat_to").html(end);
+        return {
+            start: start,
+            end: end
+        }
+    }
+
+    function filterData(data, start, end) {
+        var parseTime = d3.timeParse("%Y-%m-%d");
+        data = data.filter(function(d){
+            if (d.date instanceof Date) {
+                dt = d.date;
+            } else {
+                dt = parseTime(d.date);
+            }
+            return dt.getTime() >= parseTime(start).getTime() &&
+                dt.getTime() <= parseTime(end).getTime();
+        });
+        $("#stat_from").val(start);
+        $("#stat_to").val(end);
         $("#total_days").html(data.length);
 
         var sum = 0;
@@ -341,15 +330,12 @@
         return data;
     }
 
-    function updateCorrelation(data, column_abbr_map) {
+    function updateCorrelation(data, target_cols, column_abbr_map) {
         data_corr = []
-        cols = ["new_cases", "new_tests", "new_deaths", "new_people_vaccinated"];
-        cols = cols.concat(["new_age_0-9_conf_case", "new_age_10-19_conf_case", "new_age_20-29_conf_case", "new_age_30-39_conf_case", "new_age_40-49_conf_case", "new_age_50-59_conf_case", "new_age_60-69_conf_case", "new_age_70-79_conf_case", "new_age_over-80_conf_case"]);
-        cols = cols.concat(["var_others_num", "var_Alpha_num", "var_Delta_num", "var_B.1.620_num", "var_Epsilon_num"]);
 
         for (var i = 0; i < data.length; i++){
             var obj = {index: i};
-            cols.forEach(col => {
+            target_cols.forEach(col => {
                 if (data[i][col] == "") {
                     obj[col] = 0;
                 } else {
@@ -358,7 +344,7 @@
             });
             data_corr.push(obj);
         }
-        var corr = jz.arr.correlationMatrix(data_corr, cols);
+        var corr = jz.arr.correlationMatrix(data_corr, target_cols);
 
         var new_cases_corr = corr.filter(d => d.column_x == "new_cases" && d.column_y != "new_cases");
         var extent = d3.extent(new_cases_corr.map(function(d){ return d.correlation; }));
@@ -377,7 +363,10 @@
     }
 
     // https://bl.ocks.org/HarryStevens/302d078a089caf5aeb13e480b86fdaeb
-    function drawCorrelationMatrix(data, corr, cols, box_size, chart_id) {
+    function drawCorrelationMatrix(data, corr, target_cols, box_size, chart_id) {
+        // clear previous chart
+        d3.selectAll(chart_id + " > *").remove();
+
         // var extent = d3.extent(corr.map(function(d){ return d.correlation; }).filter(function(d){ return d !== 1; }));
         var extent = d3.extent(corr.map(function(d){ return d.correlation; }));
 
@@ -425,10 +414,12 @@
                 return piyg(normalized_corr[i]);
             })
 
+        target_col_names = target_cols.map(column_name => column_abbr_map[column_name]);
+
         // correlation matrix > y label
         vis.append("g")
             .attr("transform", "translate(" + 0 + "," + top_legend_margin + ")")
-            .selectAll("text").data(cols)
+            .selectAll("text").data(target_col_names)
             .enter().append("text")
             .attr("x", legend_left_width-5)
             .attr("y", function(d, i) { return i * box_size + 8; })
@@ -441,12 +432,12 @@
         // rotate text 45 degrees: https://www.d3-graph-gallery.com/graph/custom_axis.html
         // The scaleBand() function is ideal to build categorical axis.
         var x = d3.scaleBand()
-            .domain(cols)
-            .range([legend_left_width, legend_left_width+box_size*(cols.length)-1]);
+            .domain(target_col_names)
+            .range([legend_left_width, legend_left_width+box_size*(target_col_names.length)-1]);
 
         // Draw the axis
         vis.append("g")
-            .attr("transform", "translate(" + 0 + ", " + (top_legend_margin + box_size * cols.length) + ")")
+            .attr("transform", "translate(" + 0 + ", " + (top_legend_margin + box_size * target_col_names.length) + ")")
             .call(
                 d3.axisBottom(x)
                     .tickSize(0)
@@ -515,8 +506,8 @@
                 var row_pos = parseInt((d.offsetY-top_legend_margin) / box_size);
                 var col_pos = parseInt((d.offsetX-legend_left_width) / box_size);
 
-                var row_name = cols[row_pos];
-                var col_name = cols[col_pos];
+                var row_name = target_col_names[row_pos];
+                var col_name = target_col_names[col_pos];
 
                 var x_pos_idx = col_pos;
                 if (x_pos_idx < 3) {
@@ -542,6 +533,10 @@
     }
 
     function drawChart(data, chart_size, column_name, chart_id, has_x_axis, chart_title) {
+        // clear previous chart
+        d3.selectAll(chart_id + " > *").remove();
+
+        var chart_data = data;
         var parseTime = d3.timeParse("%Y-%m-%d");
         var width = chart_size.width;
         var height = chart_size.height;
@@ -554,6 +549,9 @@
 
         var dates = [];
         for (let obj of data) {
+            if (obj.date instanceof Date) {
+                obj.date = formatDateToYYYYMMDD(obj.date);
+            }
             dates.push(parseTime(obj.date));
         }
         var domain = d3.extent(dates); // date: from ~ to
@@ -562,11 +560,7 @@
         var xAxis = d3.axisBottom(xScale);
 
         var x = d3.scaleBand().domain(Array.from(Array(dates.length).keys())).range([0, width]);
-        var x_invert = d3.scaleBand().domain(Array.from(Array(dates.length).keys())).range([width, 0]);
-
         var y = d3.scaleLinear().domain([0, max_val]).range([height, 0]);
-        var y_invert = d3.scaleLinear().domain([0, max_val]).range([0, height]);
-
         var ys = d3.scaleLinear().domain([0, 1]).range([0, height/max_val]);
         var vis = d3.select(chart_id)
             .attr("width", width + 2 * margin)
@@ -661,16 +655,84 @@
         const makeAnnotations = d3.annotation()
             .notePadding(0)
             .type(type)
-            .annotations(annotations)
+            .annotations(annotations);
 
         vis.append("g")
             .attr("class", "annotation-group")
-            .call(makeAnnotations)
+            .call(makeAnnotations);
+
+        // create a custom tooltip
+        // References:
+        //  vertical bar: https://bl.ocks.org/larsenmtl/e3b8b7c2ca4787f77d78f58d41c3da91
+        //  custom tooltip: https://bl.ocks.org/d3noob/a22c42db65eb00d4e369
+        // Define the div for the tooltip
+        var div = d3.select("body").append("div")
+            .attr("class", "my_tooltip")
+            .style("opacity", 0);
+
+        var mouseG = d3.select(chart_id).append("g")
+            .attr("transform", "translate(" + 0 + "," + 0 + ")")
+            .attr("class", "mouse-over-effects");
+
+        mouseG.append("path") // vertical line to follow mouse
+            .attr("transform", "translate(" + 0 + "," + top_margin + ")")
+            .attr("class", "mouse-line")
+            .style("stroke", "black")
+            .style("stroke-width", "1px")
+            .style("opacity", "0")
+        ;
+
+        var one_row_data = [{values: data}];
+        mouseG.append('svg:rect') // append a rect to catch mouse movements on canvas
+            .attr("transform", "translate(" + margin + "," + top_margin + ")") // 마우스 캡쳐할 영역도 margin 고려해야 함.
+            .attr('width', width ) // can't catch mouse events on a g element
+            .attr('height', height)
+            .attr('fill', 'none')
+            .attr('pointer-events', 'all')
+            .data(one_row_data)
+            .on('mouseout', function() { // on mouse out hide line, circles and text
+                d3.select(chart_id).select(".mouse-line").style("opacity", "0");
+                div.style("opacity", 0);
+            })
+            .on('mouseover', function(d) { // on mouse in show line, circles and text
+                d3.select(chart_id).select(".mouse-line").style("opacity", "1");
+            })
+            .on('mousemove', function(event, d) { // mouse moving over canvas
+                var mouse = d3.pointer(event);
+
+                // find data index from x-position
+                // https://stackoverflow.com/questions/40573630/how-can-i-implement-an-invert-function-for-a-point-scale
+                var xScale = x;
+                var xPos = mouse[0]
+                var domain = xScale.domain();
+                var range = xScale.range();
+                var rangePoints = d3.range(range[0], range[1], xScale.step())
+                var xIndex = domain[d3.bisect(rangePoints, xPos) -1];
+                var selectedData = d.values[xIndex];
+                // console.log(xIndex, selectedData);
+
+                if (selectedData) {
+                    div.html(formatDateToYYYYMMDD(selectedData.date) + "<br>" + comma(selectedData[column_name]))
+                        .style("opacity", .7)
+                        .style("left", (event.pageX + 2) + "px")
+                        .style("top", (event.pageY - 38) + "px");
+                }
+
+                d3.select(chart_id).select(".mouse-line")
+                    .attr("d", function() {
+                        var d = "M" + (mouse[0] + margin) + "," + height;
+                        d += " " + (mouse[0] + margin) + "," + 0;
+                        return d;
+                    });
+            });
 
         return vis;
     }
 
-    function drawLineChart(data, chart_size, column_names, legends, chart_id, has_x_axis, chart_title) {
+    function drawLineChart(data, chart_size, column_abbr_map, column_names, legends, chart_id, has_x_axis, chart_title) {
+        // clear previous chart
+        d3.selectAll(chart_id + " > *").remove();
+
         var parseTime = d3.timeParse("%Y-%m-%d");
         var width = chart_size.width;
         var height = chart_size.height;
@@ -680,7 +742,10 @@
         // format the data
         var dates = [];
         data.forEach(function(d) {
-            d.date = parseTime(d.date);
+            if (d.date instanceof Date) {
+            } else {
+                d.date = parseTime(d.date);
+            }
             dates.push(d.date);
             column_names.forEach(function(col) {
                 d[col] = +d[col];
@@ -739,6 +804,9 @@
         var domain = d3.extent(dates); // date: from ~ to
         var xScale = d3.scaleTime().domain(domain).range([0, width]);
         var xAxis = d3.axisBottom(xScale);
+
+        var xBand = d3.scaleBand().domain(Array.from(Array(dates.length).keys())).range([0, width]);
+
         d3.select(chart_id)
             .append("g")
             .attr("class", "xaxis")
@@ -811,15 +879,88 @@
         const makeAnnotations = d3.annotation()
             .notePadding(0)
             .type(type)
-            .annotations(annotations)
+            .annotations(annotations);
 
         vis.append("g")
             .attr("class", "annotation-group")
-            .call(makeAnnotations)
+            .call(makeAnnotations);
+
+        // create a custom tooltip
+        // References:
+        //  vertical bar: https://bl.ocks.org/larsenmtl/e3b8b7c2ca4787f77d78f58d41c3da91
+        //  custom tooltip: https://bl.ocks.org/d3noob/a22c42db65eb00d4e369
+        // Define the div for the tooltip
+        var div = d3.select("body").append("div")
+            .attr("class", "my_tooltip")
+            .style("opacity", 0);
+
+        var mouseG = d3.select(chart_id).append("g")
+            .attr("transform", "translate(" + 0 + "," + 0 + ")")
+            .attr("class", "mouse-over-effects");
+
+        mouseG.append("path") // vertical line to follow mouse
+            .attr("transform", "translate(" + 0 + "," + top_margin + ")")
+            .attr("class", "mouse-line")
+            .style("stroke", "black")
+            .style("stroke-width", "1px")
+            .style("opacity", "0")
+        ;
+
+        var one_row_data = [{values: data}];
+        mouseG.append('svg:rect') // append a rect to catch mouse movements on canvas
+            .attr("transform", "translate(" + margin + "," + top_margin + ")") // 마우스 캡쳐할 영역도 margin 고려해야 함.
+            .attr('width', width ) // can't catch mouse events on a g element
+            .attr('height', height)
+            .attr('fill', 'none')
+            .attr('pointer-events', 'all')
+            .data(one_row_data)
+            .on('mouseout', function() { // on mouse out hide line, circles and text
+                d3.select(chart_id).select(".mouse-line").style("opacity", "0");
+                div.style("opacity", 0);
+            })
+            .on('mouseover', function(d) { // on mouse in show line, circles and text
+                d3.select(chart_id).select(".mouse-line").style("opacity", "1");
+            })
+            .on('mousemove', function(event, d) { // mouse moving over canvas
+                var mouse = d3.pointer(event);
+
+                // find data index from x-position
+                // https://stackoverflow.com/questions/40573630/how-can-i-implement-an-invert-function-for-a-point-scale
+                var xScale = xBand;
+                var xPos = mouse[0]
+                var domain = xScale.domain();
+                var range = xScale.range();
+                var rangePoints = d3.range(range[0], range[1], xScale.step())
+                var xIndex = domain[d3.bisect(rangePoints, xPos) -1];
+                var selectedData = d.values[xIndex];
+                // console.log(xIndex, selectedData);
+
+                if (selectedData) {
+                    var msg = formatDateToYYYYMMDD(selectedData.date);
+                    column_names.forEach(function(column_name) {
+                        msg += "<br>" + column_abbr_map[column_name] + ": " + comma(selectedData[column_name]);
+                    });
+                    div.html(msg)
+                        .style("opacity", .7)
+                        .style("left", (event.pageX + 2) + "px")
+                        .style("top", (event.pageY - 38) + "px")
+                    ;
+                }
+
+                d3.select(chart_id).select(".mouse-line")
+                    .attr("d", function() {
+                        var d = "M" + (mouse[0] + margin) + "," + height;
+                        d += " " + (mouse[0] + margin) + "," + 0;
+                        return d;
+                    });
+            });
     }
 
     // https://bl.ocks.org/DimsumPanda/689368252f55179e12185e13c5ed1fee
     function drawStackedBarChart(data, chart_size, column_names, legends, chart_id, has_x_axis, chart_title) {
+        // clear previous chart
+        d3.selectAll(chart_id + " > *").remove();
+
         var parseTime = d3.timeParse("%Y-%m-%d");
         var width = chart_size.width;
         var height = chart_size.height;
@@ -829,6 +970,10 @@
         // format the data
         var dates = [];
         data.forEach(function(d) {
+            if (d.date instanceof Date) {
+            } else {
+                d.date = parseTime(d.date);
+            }
             dates.push(d.date);
             var total = 0;
             column_names.forEach(function(col) {
@@ -842,6 +987,7 @@
         // domain[1] = parseTime('2021-08-01'); // set end date to 2021-08-01
         var xScale = d3.scaleTime().domain(domain).range([0, width]);
         var xAxis = d3.axisBottom(xScale);
+        var xBand = d3.scaleBand().domain(Array.from(Array(dates.length).keys())).range([0, width]);
 
         var vis = d3.select(chart_id)
             .attr("width", width + 2 * margin)
@@ -945,28 +1091,109 @@
         const makeAnnotations = d3.annotation()
             .notePadding(0)
             .type(type)
-            .annotations(annotations)
+            .annotations(annotations);
 
         vis.append("g")
             .attr("class", "annotation-group")
-            .call(makeAnnotations)
+            .call(makeAnnotations);
+
+        // create a custom tooltip
+        // References:
+        //  vertical bar: https://bl.ocks.org/larsenmtl/e3b8b7c2ca4787f77d78f58d41c3da91
+        //  custom tooltip: https://bl.ocks.org/d3noob/a22c42db65eb00d4e369
+        // Define the div for the tooltip
+        var div = d3.select("body").append("div")
+            .attr("class", "my_tooltip")
+            .style("opacity", 0);
+
+        var mouseG = d3.select(chart_id).append("g")
+            .attr("transform", "translate(" + 0 + "," + 0 + ")")
+            .attr("class", "mouse-over-effects");
+
+        mouseG.append("path") // vertical line to follow mouse
+            .attr("transform", "translate(" + 0 + "," + top_margin + ")")
+            .attr("class", "mouse-line")
+            .style("stroke", "black")
+            .style("stroke-width", "1px")
+            .style("opacity", "0")
+        ;
+
+        var one_row_data = [{values: data}];
+        mouseG.append('svg:rect') // append a rect to catch mouse movements on canvas
+            .attr("transform", "translate(" + margin + "," + top_margin + ")") // 마우스 캡쳐할 영역도 margin 고려해야 함.
+            .attr('width', width ) // can't catch mouse events on a g element
+            .attr('height', height)
+            .attr('fill', 'none')
+            .attr('pointer-events', 'all')
+            .data(one_row_data)
+            .on('mouseout', function() { // on mouse out hide line, circles and text
+                d3.select(chart_id).select(".mouse-line").style("opacity", "0");
+                div.style("opacity", 0);
+            })
+            .on('mouseover', function(d) { // on mouse in show line, circles and text
+                d3.select(chart_id).select(".mouse-line").style("opacity", "1");
+            })
+            .on('mousemove', function(event, d) { // mouse moving over canvas
+                var mouse = d3.pointer(event);
+
+                // find data index from x-position
+                // https://stackoverflow.com/questions/40573630/how-can-i-implement-an-invert-function-for-a-point-scale
+                var xScale = xBand;
+                var xPos = mouse[0]
+                var domain = xScale.domain();
+                var range = xScale.range();
+                var rangePoints = d3.range(range[0], range[1], xScale.step())
+                var xIndex = domain[d3.bisect(rangePoints, xPos) -1];
+                var selectedData = d.values[xIndex];
+                // console.log(xIndex, selectedData);
+
+                if (selectedData) {
+                    var msg = formatDateToYYYYMMDD(selectedData.date);
+                    column_names.forEach(function(column_name) {
+                        msg += "<br>" + column_abbr_map[column_name] + ": " + comma(selectedData[column_name]);
+                    });
+                    msg += "<br> total: " + selectedData.total;
+                    div.html(msg)
+                        .style("opacity", .7)
+                        .style("left", (event.pageX + 2) + "px")
+                        .style("top", (event.pageY - 38) + "px")
+                    ;
+                }
+
+                d3.select(chart_id).select(".mouse-line")
+                    .attr("d", function() {
+                        var d = "M" + (mouse[0] + margin) + "," + height;
+                        d += " " + (mouse[0] + margin) + "," + 0;
+                        return d;
+                    });
+            });
     }
 
-    async function init(column_abbr_map) {
-        // Source: COVID-19 (coronavirus) by Our World in Data
-        // https://github.com/owid/covid-19-data/tree/master/public/data
-        const csv_data = await d3.csv('./covid_kor_all.csv');
-
-        const data = filterData(csv_data);
-
-        calculatedColumnsInfo = updateCorrelation(data, column_abbr_map);
+    function updateCorr(data) {
+        calculatedColumnsInfo = updateCorrelation(data, target_cols, column_abbr_map);
         corr = calculatedColumnsInfo.corr;
         cols = calculatedColumnsInfo.cols;
         cols_name = calculatedColumnsInfo.cols_name;
 
         // correlation matrix
         const box_size = 10;
-        drawCorrelationMatrix(data, corr, cols_names, box_size, "#chart_corr");
+        drawCorrelationMatrix(data, corr, target_cols, box_size, "#chart_corr");
+    }
+
+    async function init(column_abbr_map) {
+        var parseTime = d3.timeParse("%Y-%m-%d");
+
+        // Source: COVID-19 (coronavirus) by Our World in Data
+        // https://github.com/owid/covid-19-data/tree/master/public/data
+        global_data = await d3.csv('./covid_kor_all.csv');
+
+        const result = getStartEndFromUrl();
+        var start = result.start;
+        var end = result.end;
+
+        filteredData = filterData(global_data, start, end);
+
+        updateCorr(filteredData);
 
         var chart_size = {
             width: 300,
@@ -975,67 +1202,22 @@
             top_margin: 45
         }
 
-        var vis = drawChart(data, chart_size, 'new_cases', '#chart_new_cases', true, 'new cases');
-        var vis = drawChart(data, chart_size, 'new_tests', '#chart_new_tests', true, 'new tests');
-        var vis = drawChart(data, chart_size, 'new_deaths', '#chart_new_deaths', true, 'new deaths');
-        var vis = drawChart(data, chart_size, 'new_people_vaccinated', '#chart_new_people_vaccinated', true, 'new people vaccinated');
+        var vis = drawChart(filteredData, chart_size, 'new_cases', '#chart_new_cases', true, 'new cases');
+        var vis = drawChart(filteredData, chart_size, 'new_tests', '#chart_new_tests', true, 'new tests');
+        var vis = drawChart(filteredData, chart_size, 'new_deaths', '#chart_new_deaths', true, 'new deaths');
+        var vis = drawChart(filteredData, chart_size, 'new_people_vaccinated', '#chart_new_people_vaccinated', true, 'new people vaccinated');
 
         // age_0-9_conf_case ~ age_over-80_conf_case
-        drawLineChart(data, chart_size,
+        drawLineChart(filteredData, chart_size, column_abbr_map,
             ["new_age_0-9_conf_case", "new_age_10-19_conf_case", "new_age_20-29_conf_case", "new_age_30-39_conf_case", "new_age_40-49_conf_case", "new_age_50-59_conf_case", "new_age_60-69_conf_case", "new_age_70-79_conf_case", "new_age_over-80_conf_case"],
             ["age 0-9", "age 10-19", "age 20-29", "age 30-39", "age 40-49", "age 50-59", "age 60-69", "age 70-79", "age 80+"],
             '#chart_age', false, 'new cases by age');
 
         // Top 6 Variants
-        drawStackedBarChart(data, chart_size,
+        drawStackedBarChart(filteredData, chart_size,
             ["var_others_num", "var_Alpha_num", "var_Delta_num", "var_B.1.620_num", "var_Epsilon_num"],
             ["others", "Alpha", "Delta", "B.1.620", "Epsilon"],
             '#chart_variants', false, 'new cases by variants');
-
-        //////////////////////////////////////////////////
-        // mouse actions
-        //////////////////////////////////////////////////
-        // var color = d3.scaleOrdinal(d3.schemeCategory10);
-        // var mouseG = vis.append("g")
-        //     .attr("class", "mouse-over-effects");
-        //
-        // mouseG.append("path") // this is the black vertical line to follow mouse
-        //     .attr("class", "mouse-line")
-        //     .style("stroke", "black")
-        //     .style("stroke-width", "1px")
-        //     .style("opacity", "0");
-        //
-        // mouseG.append('svg:rect') // append a rect to catch mouse movements on canvas
-        //     .attr("transform", "translate(" + margin + "," + top_margin + ")") // 마우스 캡쳐할 영역도 margin 고려해야 함.
-        //     .attr('width', width) // can't catch mouse events on a g element
-        //     .attr('height', height)
-        //     .attr('fill', 'none')
-        //     .attr('pointer-events', 'all')
-        //     .on('mouseout', function() { // on mouse out hide line, circles and text
-        //         d3.select(".mouse-line")
-        //             .style("opacity", "0");
-        //         d3.selectAll(".mouse-per-line circle")
-        //             .style("opacity", "0");
-        //         d3.selectAll(".mouse-per-line text")
-        //             .style("opacity", "0");
-        //     })
-        //     .on('mouseover', function() { // on mouse in show line, circles and text
-        //         d3.select(".mouse-line")
-        //             .style("opacity", "1");
-        //         d3.selectAll(".mouse-per-line circle")
-        //             .style("opacity", "1");
-        //         d3.selectAll(".mouse-per-line text")
-        //             .style("opacity", "1");
-        //     })
-        //     .on('mousemove', function(event) { // mouse moving over canvas
-        //         var mouse = d3.pointer(event);
-        //         d3.select(".mouse-line")
-        //             .attr("d", function() {
-        //                 var d = "M" + (mouse[0] + margin) + "," + height;
-        //                 d += " " + (mouse[0] + margin) + "," + 0;
-        //                 return d;
-        //             });
-        //     });
     }
 </script>
 
